@@ -1,4 +1,4 @@
-const NewPost = ({ title, onChange, btnChangeNameClicked }) => {
+const NewPost = ({ title, onChange, btnSaveClicked }) => {
     return (
         <>
             <input
@@ -8,7 +8,7 @@ const NewPost = ({ title, onChange, btnChangeNameClicked }) => {
                 onChange={onChange}
                 value={title}
             />
-            <button onClick={btnChangeNameClicked}>Change name</button>
+            <button onClick={btnSaveClicked}>Save</button>
         </>
     );
 };

@@ -1,49 +1,127 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+import apiConfig from "./../configs/api";
+
 import NewPost from "../components/NewPost";
 import Posts from "../components/Posts";
 import PostDetail from "../components/PostDetail";
 
 const Dashboard = () => {
-    const [postsState, setPostsState] = useState([
-        {
-            id: 0,
-            title: "Title 1",
-            author: "Author 1",
-        },
-        {
-            id: 1,
-            title: "Title 2",
-            author: "Author 2",
-        },
-        {
-            id: 2,
-            title: "Title 3",
-            author: "Author 3",
-        },
-    ]);
+    const [postsState, setPostsState] = useState([]);
+    const [reloadPostData, setReloadPostData] = useState(false);
 
-    const [postSelect, setPostSelect] = useState({});
+    const [postState, setPostState] = useState({
+        title: "",
+    });
+    const [postSelect, setPostSelect] = useState({ id: 0, title: "" });
 
-    const onChange = (events) => {
-        const copy = [...postsState];
-        copy[0][events.target.name] = events.target.value;
-        setPostsState(copy);
+    useEffect(() => {
+        fetchData();
+
+        return () => {};
+    }, [reloadPostData]);
+
+    const fetchData = () => {
+        axios
+            .get(apiConfig.baseUrl + "post")
+            .then((response) => {
+                const result = response.data.posts;
+                result.length = 5;
+                setPostsState(result);
+            })
+            .catch((error) => {
+                console.log(error.message);
+            });
+    };
+
+    const onInputChange = (events) => {
+        const copy = { ...postState };
+        copy[events.target.name] = events.target.value;
+        setPostState(copy);
+    };
+
+    const btnSaveClicked = () => {
+        savePostData();
+    };
+
+    const savePostData = () => {
+        const data = {
+            title: postState.title,
+        };
+
+        axios
+            .post(apiConfig.baseUrl + "posts", data)
+            .then((data) => {
+                console.log("Success", data);
+                setReloadPostData(!reloadPostData);
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
     };
 
     const onPostSelect = (id) => {
-        setPostSelect({ ...postsState[id] });
+        const post = postsState.find((x) => x.id === id);
+        setPostSelect((prevState) => ({ ...prevState, ...post }));
     };
+
+    const deleteButtonClicked = () => {
+        axios
+            .delete(apiConfig.baseUrl + "post/" + postsState.id)
+            .then((response) => {
+                console.log("Success");
+                setReloadPostData(!reloadPostData);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    };
+
+    const updateButtonClicked = () => {
+        const data = {
+            ...postsState,
+        };
+        axios
+            .put(apiConfig.baseUrl + "post/", data)
+            .then((response) => {
+                console.log("Success");
+                setReloadPostData(!reloadPostData);
+                setPostSelect({});
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    };
+
+    const onSelectInputChange = (events) => {
+        const copy = { ...postSelect };
+        copy[events.target.name] = events.target.value;
+        setPostSelect(copy);
+    };
+
     return (
         <>
             <Posts posts={postsState} onPostSelect={onPostSelect} />
             <NewPost
-                title={postsState[0].title}
+                title={postState.title}
                 onChange={(event) => {
-                    onChange(event);
+                    onInputChange(event);
                 }}
+                btnSaveClicked={btnSaveClicked}
             />
-
-            <PostDetail title={postSelect.title} />
+            {postSelect.title !== "" ? (
+                <PostDetail
+                    title={postSelect.title}
+                    onSelectInputChange={(event) => {
+                        onSelectInputChange(event);
+                    }}
+                    updateButtonClicked={updateButtonClicked}
+                    deleteButtonClicked={deleteButtonClicked}
+                />
+            ) : null}
+            <br />
+            <br />
         </>
     );
 };

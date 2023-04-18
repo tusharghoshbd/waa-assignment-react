@@ -1,13 +1,35 @@
 import { Link } from "react-router-dom";
 
-const PostDetail = ({ title }) => {
+const PostDetail = ({
+    title,
+    onSelectInputChange,
+    updateButtonClicked,
+    deleteButtonClicked,
+}) => {
     return (
         <div className="content-detail">
             <div>MIU</div>
-            <div className="min-height ">{title}</div>
+            <input
+                type="text"
+                label={"title"}
+                name={"title"}
+                onChange={onSelectInputChange}
+                value={title}
+            />
+            <br />
+            <br />
             <div>
-                <Link to="/edit">edit</Link> &nbsp;
-                <Link to="/delete">delete</Link>
+                <input
+                    type="button"
+                    value="Update"
+                    onClick={updateButtonClicked}
+                />{" "}
+                &nbsp;
+                <input
+                    type="button"
+                    value="Delete"
+                    onClick={deleteButtonClicked}
+                />
             </div>
         </div>
     );
