@@ -1,11 +1,12 @@
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { SelectedPostContext } from "../context/SelectedPostContext";
 
 const PostDetail = ({
-    title,
     onSelectInputChange,
     updateButtonClicked,
     deleteButtonClicked,
 }) => {
+    const postContext = useContext(SelectedPostContext);
     return (
         <div className="content-detail">
             <div>MIU</div>
@@ -14,7 +15,7 @@ const PostDetail = ({
                 label={"title"}
                 name={"title"}
                 onChange={onSelectInputChange}
-                value={title}
+                value={postContext.title}
             />
             <br />
             <br />

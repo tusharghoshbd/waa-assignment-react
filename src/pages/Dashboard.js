@@ -7,6 +7,8 @@ import NewPost from "../components/NewPost";
 import Posts from "../components/Posts";
 import PostDetail from "../components/PostDetail";
 
+import { SelectedPostContext } from "./../context/SelectedPostContext";
+
 const Dashboard = () => {
     const [postsState, setPostsState] = useState([]);
     const [reloadPostData, setReloadPostData] = useState(false);
@@ -35,9 +37,9 @@ const Dashboard = () => {
             });
     };
 
-    const onInputChange = (events) => {
+    const onInputChange = (title) => {
         const copy = { ...postState };
-        copy[events.target.name] = events.target.value;
+        copy["title"] = title;
         setPostState(copy);
     };
 
@@ -110,16 +112,17 @@ const Dashboard = () => {
                 }}
                 btnSaveClicked={btnSaveClicked}
             />
-            {postSelect.title !== "" ? (
-                <PostDetail
-                    title={postSelect.title}
-                    onSelectInputChange={(event) => {
-                        onSelectInputChange(event);
-                    }}
-                    updateButtonClicked={updateButtonClicked}
-                    deleteButtonClicked={deleteButtonClicked}
-                />
-            ) : null}
+            <SelectedPostContext.Provider value={postSelect}>
+                {postSelect.title !== "" ? (
+                    <PostDetail
+                        onSelectInputChange={(event) => {
+                            onSelectInputChange(event);
+                        }}
+                        updateButtonClicked={updateButtonClicked}
+                        deleteButtonClicked={deleteButtonClicked}
+                    />
+                ) : null}
+            </SelectedPostContext.Provider>
             <br />
             <br />
         </>
